@@ -1,0 +1,10 @@
+dotenv
+fastapi
+numpy
+networkx
+osmnx
+requests
+uvicorn
+pydantic
+sklearn
+scikit-learn

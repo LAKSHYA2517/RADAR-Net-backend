@@ -18,28 +18,28 @@ def process_route(data: RouteRequest):
     if dest_coords is None:
         raise HTTPException(status_code=404, detail="Location not found")
 
-    start_coords = {
-        "lat": data.start_lat,
-        "lon": data.start_lon
-    }
+    # start_coords = {
+    #     "lat": data.start_lat,
+    #     "lon": data.start_lon
+    # }
 
     # Step 2: Send to Prithvi model backend
     # result = send_to_prithvi(start_coords, dest_coords)
 
     
-    north = 12.98
-    south = 12.95
-    east = 77.62
-    west = 77.58
+    north = max(data.start_lat,dest_coords["lat"])
+    south = min(data.start_lat,dest_coords["lat"])
+    east =  max(data.start_lon,dest_coords["lon"])
+    west = min(data.start_lon,dest_coords["lon"])
 
     grid_shape = (20, 20)
     flood_grid = np.random.choice([0, 1], size=grid_shape, p=[0.85, 0.15])
     
-    start_lat = 12.970
-    start_lon = 77.585
+    start_lat = data.start_lat
+    start_lon = data.start_lon
     
-    end_lat = 12.955
-    end_lon = 77.610
+    end_lat = dest_coords["lat"]
+    end_lon = dest_coords["lon"]
     
     try:
         G_reachable = get_reachable_roads(north=north, south=south, east=east, west=west,flood_grid=flood_grid,network_type='drive',edge_sample_points=15)
@@ -68,7 +68,7 @@ def process_route(data: RouteRequest):
         
         return route_geojson
     except Exception as e:
-        return JSONResponse(status_code=500, content={"message": "Error in OSM section"})
         print(f"\n❌ Error: {e}")
         import traceback
         traceback.print_exc()
+        return JSONResponse(status_code=500, content={"message": "Error in OSM section"})
